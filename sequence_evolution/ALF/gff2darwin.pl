@@ -10,6 +10,7 @@ use warnings;
 
 # BioPerl modules
 use Bio::SeqIO;
+use Bio::PrimarySeqI;
 use Bio::Tools::GFF;
 
 my $help_message = <<END;
@@ -139,17 +140,25 @@ else
    foreach my $gene_feature (@genes)
    {
       my @product = $gene_feature->get_tag_values("product");
-       #my @trans = $gene_feature->get_tag_values("translation");
+       #print STDERR $gene_feature->get_tag_values();
+       my $sequence = uc($gene_feature->seq->seq()); # Get DNA sequence
+       
+       if (index($product[0], "RNA") == -1){ # Only include non-RNA products
+           my $translation1 =  Bio::Seq->new(-seq => $sequence)->translate(-frame => 0)->seq; # Translate to protein
+           $translation1 =~ s/\*//; # Replace stop codon (*) with nothing
+           
+           $product[0] =~ s/"//g;
+           #$trans[0] =~ s/"//g;
+           
+           my $output_line = "<E><ID>" . $gene_feature->primary_id() . "</ID><DE>" . $product[0]
+           . "</DE><OS>Pseudomonas aeruginosa PA1</OS><SEQ>" . $translation1 .
+           "</SEQ><DNA>" . $sequence . "</DNA></E>";
+           print $output_line ."\n";
 
-      $product[0] =~ s/"//g;
-       #$trans[0] =~ s/"//g;
-      my $sequence = uc($gene_feature->seq->seq());
+           
+       }
 
-      my $output_line = "<E><ID>" . $gene_feature->primary_id() . "</ID><DE>" . $product[0]
-       . "</DE><OS>Pseudomonas aeruginosa PA1</OS>" . #$trans[0] .
-                "DNA>" . $sequence . "</DNA></E>";
-       print $output_line ."\n";
-
+      
    }
 }
 
