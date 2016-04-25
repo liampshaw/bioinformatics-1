@@ -125,10 +125,10 @@ else
    while (my $feature = $gff_in->next_feature())
    {
       # Looking at products is more reliable than gene tags
-      if ($feature->has_tag("translation"))
-      {
+       #if ($feature->has_tag("translation"))
+          #{
          push(@genes, $feature);
-      }
+          #}
    }
 
    my @sequences = $gff_in->get_seqs();
@@ -139,16 +139,16 @@ else
    foreach my $gene_feature (@genes)
    {
       my @product = $gene_feature->get_tag_values("product");
-      my @trans = $gene_feature->get_tag_values("translation");
+       #my @trans = $gene_feature->get_tag_values("translation");
 
       $product[0] =~ s/"//g;
-      $trans[0] =~ s/"//g;
+       #$trans[0] =~ s/"//g;
       my $sequence = uc($gene_feature->seq->seq());
 
       my $output_line = "<E><ID>" . $gene_feature->primary_id() . "</ID><DE>" . $product[0]
-                        . "</DE><OS>Streptococcus pneumoniae</OS><SEQ>" . $trans[0]
-                        . "</SEQ><DNA>" . $sequence . "</DNA></E>";
-      print $output_line ."\n";
+       . "</DE><OS>Pseudomonas aeruginosa PA1</OS>" . #$trans[0] .
+                "DNA>" . $sequence . "</DNA></E>";
+       print $output_line ."\n";
 
    }
 }
